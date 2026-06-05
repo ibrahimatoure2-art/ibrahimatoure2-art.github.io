@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TROPICAL — Système de Gestion Hospitalière</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tropical.css">
+<style>
+:root {
+  --teal: #0D9488;
+  --teal-light: #CCFBF1;
+  --teal-dark: #0F766E;
+  --teal-deeper: #134E4A;
+  --navy: #0F1A2E;
+  --navy2: #1A2942;
+  --navy3: #243552;
+  --slate: #64748B;
+  --slate-light: #94A3B8;
+  --white: #FFFFFF;
+  --off: #F8FAFC;
+  --border: rgba(255,255,255,0.08);
+  --card: rgba(255,255,255,0.04);
+  --red: #EF4444;
+  --amber: #F59E0B;
+  --green: #10B981;
+  --blue: #3B82F6;
+  --purple: #8B5CF6;
+  --sidebar-w: 260px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 100;
+  overflow-y: auto;
+  transition: transform 0.3s;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-badge {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: 1px; }
+.logo-sub { font-size: 10px; color: var(--slate-light); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
+
+.user-profile {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 13px; flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 500; }
+.user-role { font-size: 11px; color: var(--teal-light); }
+
+.nav-section { padding: 12px 0; }
+.nav-label {
+  padding: 6px 20px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--slate);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--slate-light);
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--card); color: var(--white); }
+.nav-item.active {
+  background: rgba(13,148,136,0.12);
+  color: var(--teal-light);
+  border-left-color: var(--teal);
+}
+.nav-item i { width: 18px; text-align: center; font-size: 14px; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: white; font-size: 10px; font-weight: 600;
+  padding: 2px 6px; border-radius: 10px;
+}
+.nav-badge.info { background: var(--teal); }
+.nav-badge.warn { background: var(--amber); color: var(--navy); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--navy2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-size: 16px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 12px;
+  font-size: 13px; color: var(--slate-light);
+  cursor: pointer; transition: border 0.2s;
+  min-width: 200px;
+}
+.topbar-search:hover { border-color: var(--teal); }
+.topbar-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--card); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; transition: all 0.15s;
+  color: var(--slate-light); font-size: 15px;
+}
+.topbar-btn:hover { background: rgba(13,148,136,0.15); color: var(--teal-light); }
+.notif-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red); position: absolute; top: 6px; right: 6px;
+  border: 1.5px solid var(--navy2);
+}
+.date-badge {
+  font-size: 12px; color: var(--slate-light);
+  background: var(--card); border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 8px;
+}
+
+/* CONTENT */
+.content { padding: 28px; flex: 1; }
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; }
+
+/* SECTION HEADER */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.section-title { font-size: 22px; font-weight: 500; }
+.section-sub { font-size: 13px; color: var(--slate-light); margin-top: 3px; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; border: none; font-family: inherit;
+}
+.btn-primary {
+  background: var(--teal); color: white;
+}
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-outline {
+  background: transparent; color: var(--slate-light);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--teal); color: var(--teal-light); }
+.btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* STAT CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.teal::before { background: linear-gradient(90deg, var(--teal), transparent); }
+.stat-card.amber::before { background: linear-gradient(90deg, var(--amber), transparent); }
+.stat-card.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+.stat-card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+.stat-card.blue::before { background: linear-gradient(90deg, var(--blue), transparent); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+
+.stat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; margin-bottom: 14px;
+}
+.stat-card.teal .stat-icon { background: rgba(13,148,136,0.15); color: var(--teal); }
+.stat-card.amber .stat-icon { background: rgba(245,158,11,0.15); color: var(--amber); }
+.stat-card.red .stat-icon { background: rgba(239,68,68,0.15); color: var(--red); }
+.stat-card.purple .stat-icon { background: rgba(139,92,246,0.15); color: var(--purple); }
+.stat-card.blue .stat-icon { background: rgba(59,130,246,0.15); color: var(--blue); }
+.stat-card.green .stat-icon { background: rgba(16,185,129,0.15); color: var(--green); }
+
+.stat-value { font-size: 28px; font-weight: 600; line-height: 1; }
+.stat-label { font-size: 12px; color: var(--slate-light); margin-top: 5px; }
+.stat-trend {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; margin-top: 8px;
+}
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+
+/* CARDS */
+.card {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 14px; font-weight: 500; }
+.card-body { padding: 20px; }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  padding: 10px 14px; text-align: left;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--slate);
+  border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.1s;
+}
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+tbody td { padding: 12px 14px; color: var(--slate-light); }
+tbody td:first-child { color: var(--white); }
+
+/* BADGES */
+.badge {
+  display: inline-block;
+  padding: 3px 9px; border-radius: 6px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-success { background: rgba(16,185,129,0.15); color: #34D399; }
+.badge-warn { background: rgba(245,158,11,0.15); color: #FCD34D; }
+.badge-danger { background: rgba(239,68,68,0.15); color: #FCA5A5; }
+.badge-info { background: rgba(59,130,246,0.15); color: #93C5FD; }
+.badge-purple { background: rgba(139,92,246,0.15); color: #C4B5FD; }
+.badge-neutral { background: rgba(100,116,139,0.2); color: var(--slate-light); }
+
+/* GRIDS */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+/* FORMS */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 500; color: var(--slate-light); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-control {
+  width: 100%;
+  background: var(--navy3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 13px;
+  font-size: 13px; color: var(--white); font-family: inherit;
+  transition: border 0.2s; outline: none;
+}
+.form-control:focus { border-color: var(--teal); }
+.form-control option { background: var(--navy2); }
+select.form-control { cursor: pointer; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: none;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 560px; max-width: 95vw;
+  max-height: 90vh; overflow-y: auto;
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 500; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--slate-light); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: var(--card); color: var(--white); }
+.modal-body { padding: 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* CHART BARS */
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.mini-bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  background: rgba(13,148,136,0.3); transition: background 0.2s;
+}
+.mini-bar:hover { background: var(--teal); }
+
+/* ACTIVITY */
+.activity-list { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 5px; flex-shrink: 0;
+}
+.activity-text { font-size: 13px; color: var(--slate-light); line-height: 1.5; }
+.activity-text strong { color: var(--white); font-weight: 500; }
+.activity-time { font-size: 11px; color: var(--slate); margin-top: 2px; }
+
+/* ALERT */
+.alert {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 10px;
+  margin-bottom: 12px; font-size: 13px;
+}
+.alert-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #FCA5A5; }
+.alert-warn { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #FCD34D; }
+.alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34D399; }
+
+/* PROGRESS */
+.progress-bar { background: rgba(255,255,255,0.08); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+/* URGENCY levels */
+.urgence-faible { color: var(--green); }
+.urgence-moyen { color: var(--amber); }
+.urgence-eleve { color: var(--red); }
+.urgence-critique { color: #FF2D2D; font-weight: 600; }
+
+/* INTERACTION LEVELS */
+.interaction-faible { background: rgba(16,185,129,0.15); color: #34D399; border: 1px solid rgba(16,185,129,0.2); }
+.interaction-modere { background: rgba(245,158,11,0.15); color: #FCD34D; border: 1px solid rgba(245,158,11,0.2); }
+.interaction-critique { background: rgba(239,68,68,0.15); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.2); }
+
+/* DOSSIER patient timeline */
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before {
+  content: '';
+  position: absolute; left: 5px; top: 0; bottom: 0;
+  width: 1px; background: var(--border);
+}
+.timeline-item { position: relative; padding-bottom: 20px; }
+.timeline-dot {
+  position: absolute; left: -18px; top: 3px;
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--navy2);
+}
+.timeline-content {
+  background: var(--card);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px;
+}
+.timeline-date { font-size: 11px; color: var(--slate); margin-bottom: 4px; }
+.timeline-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.timeline-text { font-size: 12px; color: var(--slate-light); }
+
+/* NOTIFICATION PANEL */
+.notif-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.notif-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.notif-content { flex: 1; }
+.notif-title { font-size: 13px; font-weight: 500; }
+.notif-msg { font-size: 12px; color: var(--slate-light); margin-top: 2px; }
+.notif-time { font-size: 11px; color: var(--slate); margin-top: 3px; }
+
+/* SCROLL */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--navy3); border-radius: 10px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+}
+
+/* ORDONNANCE interaction checker */
+.interaction-check {
+  border-radius: 10px; padding: 14px; margin-top: 12px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Tab system */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 10px 16px; font-size: 13px; cursor: pointer;
+  color: var(--slate-light); border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.tab.active { color: var(--teal-light); border-bottom-color: var(--teal); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Metric row */
+.metric-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.metric-row:last-child { border-bottom: none; }
+.metric-label { font-size: 13px; color: var(--slate-light); }
+.metric-val { font-size: 14px; font-weight: 500; }
+
+/* Lot expiry warning */
+.lot-expired { opacity: 0.6; }
+.lot-expiring { border-left: 3px solid var(--amber) !important; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge">
+      <div class="logo-icon">🏥</div>
+      <div>
+        <div class="logo-text">TROPICAL</div>
+        <div class="logo-sub">Système Hospitalier</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="user-profile">
+    <div class="user-avatar">AD</div>
+    <div>
+      <div class="user-name">Dr. Admin</div>
+      <div class="user-role">Administrateur</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <i class="fas fa-th-large"></i> Tableau de bord
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Patients & Soins</div>
+    <div class="nav-item" onclick="showPage('patients', this)">
+      <i class="fas fa-user-injured"></i> Patients
+      <span class="nav-badge info">247</span>
+    </div>
+    <div class="nav-item" onclick="showPage('dossiers', this)">
+      <i class="fas fa-folder-open"></i> Dossiers médicaux
+    </div>
+    <div class="nav-item" onclick="showPage('consultations', this)">
+      <i class="fas fa-stethoscope"></i> Consultations
+    </div>
+    <div class="nav-item" onclick="showPage('rdv', this)">
+      <i class="fas fa-calendar-check"></i> Rendez-vous
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('teleconsultation', this)">
+      <i class="fas fa-video"></i> Téléconsultation
+    </div>
+    <div class="nav-item" onclick="showPage('urgences', this)">
+      <i class="fas fa-ambulance"></i> Urgences
+      <span class="nav-badge">2</span>
+    </div>
+    <div class="nav-item" onclick="showPage('liste_attente', this)">
+      <i class="fas fa-list-ol"></i> Liste d'attente
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Prescriptions</div>
+    <div class="nav-item" onclick="showPage('ordonnances', this)">
+      <i class="fas fa-prescription"></i> Ordonnances
+    </div>
+    <div class="nav-item" onclick="showPage('examens', this)">
+      <i class="fas fa-microscope"></i> Résultats examens
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Pharmacie</div>
+    <div class="nav-item" onclick="showPage('medicaments', this)">
+      <i class="fas fa-pills"></i> Médicaments
+    </div>
+    <div class="nav-item" onclick="showPage('stock', this)">
+      <i class="fas fa-boxes"></i> Stock & Lots
+      <span class="nav-badge warn">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('alertes', this)">
+      <i class="fas fa-exclamation-triangle"></i> Alertes stock
+      <span class="nav-badge">3</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Finance</div>
+    <div class="nav-item" onclick="showPage('factures', this)">
+      <i class="fas fa-file-invoice"></i> Factures
+    </div>
+    <div class="nav-item" onclick="showPage('paiements', this)">
+      <i class="fas fa-credit-card"></i> Paiements
+    </div>
+    <div class="nav-item" onclick="showPage('assurances', this)">
+      <i class="fas fa-shield-alt"></i> Assurances
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Administration</div>
+    <div class="nav-item" onclick="showPage('centres', this)">
+      <i class="fas fa-hospital"></i> Centres hospitaliers
+    </div>
+    <div class="nav-item" onclick="showPage('services', this)">
+      <i class="fas fa-sitemap"></i> Services
+    </div>
+    <div class="nav-item" onclick="showPage('medecins', this)">
+      <i class="fas fa-user-md"></i> Médecins
+    </div>
+    <div class="nav-item" onclick="showPage('notifications', this)">
+      <i class="fas fa-bell"></i> Notifications
+      <span class="nav-badge">7</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <button class="topbar-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none" id="menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="topbar-title" id="page-title">Tableau de bord</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <i class="fas fa-search" style="font-size:12px"></i>
+        Rechercher patient, dossier...
+      </div>
+      <div class="date-badge">
+        <i class="fas fa-calendar" style="margin-right:6px;font-size:11px"></i>
+        05 Juin 2026
+      </div>
+      <div class="topbar-btn" onclick="showPage('notifications', null)">
+        <i class="fas fa-bell"></i>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="topbar-btn">
+        <i class="fas fa-user-circle"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT PAGES -->
+  <div class="content">
+
+    <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Bonjour, Administrateur 👋</div>
+          <div class="section-sub">Voici le résumé de l'activité hospitalière du jour</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Rapport PDF</button>
+          <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Nouveau patient</button>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle"></i>
+        <div><strong>Urgence critique</strong> — Patient DIOP Mamadou, Service Cardiologie — Niveau CRITIQUE en attente de prise en charge</div>
+      </div>
+      <div class="alert alert-warn">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div><strong>Alerte stock</strong> — 3 médicaments en dessous du seuil minimum · <span style="text-decoration:underline;cursor:pointer" onclick="showPage('alertes',null)">Voir les alertes</span></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card teal">
+          <div class="stat-icon"><i class="fas fa-user-injured"></i></div>
+          <div class="stat-value">247</div>
+          <div class="stat-label">Patients enregistrés</div>
+          <div class="stat-trend trend-up"><i class="fas fa-arrow-up" style="font-size:9px"></i> +12 ce mois</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon"><i class="fas fa-user-md"></i></div>
+          <div class="stat-value">18</div>
+          <div class="stat-label">Médecins actifs</div>
+          <div class="stat-trend"><i class="fas fa-minus" style="font-size:9px;color:var(--slate)"></i> <span style="color:var(--slate)">Stable</span></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+          <div class="stat-value">34</div>
+          <div class="stat-label">Rendez-vous aujourd'hui</div>
+          <div class="stat-trend trend-up"><i class="fas fa-arrow-up" style="font-size:9px"></i> 8 restants</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon"><i class="fas fa-stethoscope"></i></div>
+          <div class="stat-value">26</div>
+          <div class="stat-label">Consultations du jour</div>
+          <div class="stat-trend trend-up"><i class="fas fa-arrow-up" style="font-size:9px"></i> +4 vs hier</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="fas fa-ambulance"></i></div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">Urgences en attente</div>
+          <div class="stat-trend trend-down"><i class="fas fa-circle" style="font-size:8px"></i> 2 critiques</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="fas fa-coins"></i></div>
+          <div class="stat-value">1,24M</div>
+          <div class="stat-label">Revenus du jour (FCFA)</div>
+          <div class="stat-trend trend-up"><i class="fas fa-arrow-up" style="font-size:9px"></i> +18% vs hier</div>
+        </div>
+      </div>
+
+      <!-- CHARTS + ACTIVITY -->
+      <div class="two-col" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Consultations — 7 derniers jours</div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;height:100px;gap:6px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.3);border-radius:4px 4px 0 0;min-height:20px;height:45px"></div>
+                <span style="font-size:10px;color:var(--slate)">Lun</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.3);border-radius:4px 4px 0 0;height:70px"></div>
+                <span style="font-size:10px;color:var(--slate)">Mar</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.3);border-radius:4px 4px 0 0;height:55px"></div>
+                <span style="font-size:10px;color:var(--slate)">Mer</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.3);border-radius:4px 4px 0 0;height:80px"></div>
+                <span style="font-size:10px;color:var(--slate)">Jeu</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.3);border-radius:4px 4px 0 0;height:60px"></div>
+                <span style="font-size:10px;color:var(--slate)">Ven</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:rgba(13,148,136,0.15);border-radius:4px 4px 0 0;height:35px"></div>
+                <span style="font-size:10px;color:var(--slate)">Sam</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="flex:1;width:100%;background:var(--teal);border-radius:4px 4px 0 0;height:90px"></div>
+                <span style="font-size:10px;color:var(--teal-light)">Auj</span>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:16px;font-size:12px">
+              <span style="color:var(--slate-light)">Total semaine</span>
+              <span style="font-weight:500">181 consultations</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Activité récente</div>
+            <span class="badge badge-info">En direct</span>
+          </div>
+          <div class="card-body" style="padding:12px 20px">
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--teal)"></div>
+                <div>
+                  <div class="activity-text"><strong>FALL Ibrahima</strong> — Consultation terminée · Dr. Sow</div>
+                  <div class="activity-time">Il y a 5 min</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--red)"></div>
+                <div>
+                  <div class="activity-text"><strong>Urgence #47</strong> — Nouveau patient admis · Niveau Élevé</div>
+                  <div class="activity-time">Il y a 12 min</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--amber)"></div>
+                <div>
+                  <div class="activity-text"><strong>Alerte stock</strong> — Amoxicilline 500mg sous seuil minimum</div>
+                  <div class="activity-time">Il y a 28 min</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--purple)"></div>
+                <div>
+                  <div class="activity-text"><strong>Paiement reçu</strong> — Facture #F2026-089 · 45 000 FCFA</div>
+                  <div class="activity-time">Il y a 41 min</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <div>
+                  <div class="activity-text"><strong>NDIAYE Fatou</strong> — Nouveau patient enregistré</div>
+                  <div class="activity-time">Il y a 1h 02min</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SECTION -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Prochains rendez-vous</div>
+            <button class="btn btn-outline btn-sm">Voir tout</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Patient</th><th>Médecin</th><th>Heure</th><th>Statut</th></tr></thead>
+              <tbody>
+                <tr><td>DIOP Moussa</td><td>Dr. Ba</td><td>10:30</td><td><span class="badge badge-success">Confirmé</span></td></tr>
+                <tr><td>SECK Aminata</td><td>Dr. Ndiaye</td><td>11:00</td><td><span class="badge badge-warn">En attente</span></td></tr>
+                <tr><td>CISS Abdou</td><td>Dr. Faye</td><td>14:00</td><td><span class="badge badge-info">Téléconsult</span></td></tr>
+                <tr><td>DIOUF Marème</td><td>Dr. Sow</td><td>15:30</td><td><span class="badge badge-success">Confirmé</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Revenus mensuels (FCFA)</div>
+          </div>
+          <div class="card-body">
+            <div style="font-size:28px;font-weight:600;color:var(--green);margin-bottom:4px">38,450,000</div>
+            <div style="font-size:12px;color:var(--slate-light);margin-bottom:16px">Juin 2026 · Objectif: 45,000,000</div>
+            <div class="progress-bar" style="margin-bottom:10px">
+              <div class="progress-fill" style="width:85%;background:var(--green)"></div>
+            </div>
+            <div style="font-size:12px;color:var(--slate-light)">85% de l'objectif atteint</div>
+            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="text-align:center;background:var(--card);border-radius:8px;padding:10px">
+                <div style="font-size:16px;font-weight:600">22.1M</div>
+                <div style="font-size:11px;color:var(--slate-light)">Consultations</div>
+              </div>
+              <div style="text-align:center;background:var(--card);border-radius:8px;padding:10px">
+                <div style="font-size:16px;font-weight:600">16.3M</div>
+                <div style="font-size:11px;color:var(--slate-light)">Pharmacie</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PATIENTS ═══════════════════ -->
+    <div class="page" id="page-patients">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Patients</div>
+          <div class="section-sub">247 patients enregistrés</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-patient')"><i class="fas fa-plus"></i> Nouveau patient</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="text" class="form-control" placeholder="🔍  Rechercher..." style="width:240px">
+            <select class="form-control" style="width:160px"><option>Tous les services</option><option>Cardiologie</option><option>Pédiatrie</option><option>Chirurgie</option></select>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm"><i class="fas fa-filter"></i> Filtres</button>
+            <button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Export</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Sexe</th><th>Date naissance</th><th>Téléphone</th><th>Assurance</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="color:var(--slate)">P-001</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:30px;height:30px;border-radius:50%;background:rgba(13,148,136,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--teal)">DM</div>
+                    <div><div style="font-size:13px;color:var(--white)">DIOP Mamadou</div><div style="font-size:11px;color:var(--slate)">mamadou.diop@email.sn</div></div>
+                  </div>
+                </td>
+                <td>M</td><td>15/03/1985</td><td>+221 77 123 4567</td>
+                <td><span class="badge badge-success">CNAM</span></td>
+                <td><span class="badge badge-danger">Urgence</span></td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="showPage('dossiers',null)"><i class="fas fa-folder"></i> Dossier</button>
+                    <button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="color:var(--slate)">P-002</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:30px;height:30px;border-radius:50%;background:rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--purple)">NF</div>
+                    <div><div style="font-size:13px;color:var(--white)">NDIAYE Fatou</div><div style="font-size:11px;color:var(--slate)">fatou.nd@email.sn</div></div>
+                  </div>
+                </td>
+                <td>F</td><td>22/07/1992</td><td>+221 76 987 6543</td>
+                <td><span class="badge badge-info">IPM</span></td>
+                <td><span class="badge badge-success">Actif</span></td>
+                <td><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm"><i class="fas fa-folder"></i> Dossier</button><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></div></td>
+              </tr>
+              <tr>
+                <td style="color:var(--slate)">P-003</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--blue)">SC</div>
+                    <div><div style="font-size:13px;color:var(--white)">SECK Cheikh</div><div style="font-size:11px;color:var(--slate)">c.seck@email.sn</div></div>
+                  </div>
+                </td>
+                <td>M</td><td>04/11/1978</td><td>+221 70 456 7890</td>
+                <td><span class="badge badge-neutral">Aucune</span></td>
+                <td><span class="badge badge-warn">En attente</span></td>
+                <td><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm"><i class="fas fa-folder"></i> Dossier</button><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></div></td>
+              </tr>
+              <tr>
+                <td style="color:var(--slate)">P-004</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:30px;height:30px;border-radius:50%;background:rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--amber)">BM</div>
+                    <div><div style="font-size:13px;color:var(--white)">BA Mariama</div><div style="font-size:11px;color:var(--slate)">m.ba@email.sn</div></div>
+                  </div>
+                </td>
+                <td>F</td><td>18/05/2001</td><td>+221 78 321 0987</td>
+                <td><span class="badge badge-success">CNAM</span></td>
+                <td><span class="badge badge-success">Actif</span></td>
+                <td><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm"><i class="fas fa-folder"></i> Dossier</button><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--slate-light)">Affichage 1-4 sur 247</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm">‹ Précédent</button>
+            <button class="btn btn-primary btn-sm">Suivant ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ DOSSIERS ═══════════════════ -->
+    <div class="page" id="page-dossiers">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Dossier médical — DIOP Mamadou</div>
+          <div class="section-sub">N° Dossier: DOS-2024-001 · Créé le 15/01/2024</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm"><i class="fas fa-print"></i> Imprimer</button>
+          <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Ajouter entrée</button>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Informations patient</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+              <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600">DM</div>
+              <div>
+                <div style="font-size:18px;font-weight:500">DIOP Mamadou</div>
+                <div style="font-size:13px;color:var(--teal-light)">41 ans · Masculin</div>
+              </div>
+            </div>
+            <div class="metric-row"><span class="metric-label">Date de naissance</span><span class="metric-val">15/03/1985</span></div>
+            <div class="metric-row"><span class="metric-label">Téléphone</span><span class="metric-val">+221 77 123 4567</span></div>
+            <div class="metric-row"><span class="metric-label">Adresse</span><span class="metric-val">Dakar, Plateau</span></div>
+            <div class="metric-row"><span class="metric-label">Assurance</span><span class="metric-val"><span class="badge badge-success">CNAM — 80%</span></span></div>
+            <div class="metric-row"><span class="metric-label">Groupe sanguin</span><span class="metric-val" style="color:var(--red)">A+</span></div>
+            <div class="metric-row"><span class="metric-label">Allergies</span><span class="metric-val" style="color:var(--amber)">Pénicilline, Aspirine</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Diagnostic principal</div></div>
+          <div class="card-body">
+            <div style="font-size:15px;font-weight:500;margin-bottom:8px">Hypertension artérielle grade II</div>
+            <div style="font-size:13px;color:var(--slate-light);line-height:1.6">
+              Patient hypertendu suivi depuis 2022. TA systolique régulièrement &gt; 160 mmHg. Traitement en cours par Amlodipine 10mg/j + Losartan 100mg/j. Contrôle insuffisant, adaptation thérapeutique en cours.
+            </div>
+            <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:6px">
+              <span class="badge badge-warn">HTA</span>
+              <span class="badge badge-info">Cardio-vasculaire</span>
+              <span class="badge badge-neutral">Suivi mensuel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Historique médical</div>
+        </div>
+        <div class="card-body">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab(this,'tab-consult')">Consultations</div>
+            <div class="tab" onclick="switchTab(this,'tab-ordo')">Ordonnances</div>
+            <div class="tab" onclick="switchTab(this,'tab-exam')">Examens</div>
+            <div class="tab" onclick="switchTab(this,'tab-docs')">Documents</div>
+          </div>
+          <div class="tab-panel active" id="tab-consult">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:var(--teal)"></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">05 Juin 2026 — Dr. Sow (Cardiologie)</div>
+                  <div class="timeline-title">Consultation de suivi HTA</div>
+                  <div class="timeline-text">TA: 158/94 mmHg. Légère amélioration. Maintien du traitement. Prescription d'examen bilan lipidique.</div>
+                  <div style="margin-top:8px;display:flex;gap:6px"><span class="badge badge-info">Consultation</span><span class="badge badge-warn">Ordonnance générée</span></div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:var(--blue)"></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">15 Mai 2026 — Dr. Sow (Cardiologie)</div>
+                  <div class="timeline-title">Suivi mensuel</div>
+                  <div class="timeline-text">TA: 165/98 mmHg. Mauvaise observance thérapeutique signalée. Renforcement éducation thérapeutique.</div>
+                  <div style="margin-top:8px;display:flex;gap:6px"><span class="badge badge-info">Consultation</span></div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:var(--purple)"></div>
+                <div class="timeline-content">
+                  <div class="timeline-date">10 Avril 2026 — Dr. Ndiaye (Urgences)</div>
+                  <div class="timeline-title">Urgence — Crise hypertensive</div>
+                  <div class="timeline-text">Admission aux urgences, TA: 185/110 mmHg. Traitement IV administré. Hospitalisation 48h. Sortie avec ordonnance adaptée.</div>
+                  <div style="margin-top:8px;display:flex;gap:6px"><span class="badge badge-danger">Urgence</span><span class="badge badge-warn">Hospitalisation</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" id="tab-ordo">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Date</th><th>Médecin</th><th>Médicaments</th><th>Durée</th><th>Actions</th></tr></thead>
+                <tbody>
+                  <tr><td>ORD-047</td><td>05/06/2026</td><td>Dr. Sow</td><td>Amlodipine 10mg, Losartan 100mg</td><td>30 jours</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-print"></i></button></td></tr>
+                  <tr><td>ORD-031</td><td>15/05/2026</td><td>Dr. Sow</td><td>Amlodipine 5mg, Losartan 50mg</td><td>30 jours</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-print"></i></button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-panel" id="tab-exam">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Type</th><th>Date</th><th>Commentaire</th><th>Statut</th></tr></thead>
+                <tbody>
+                  <tr><td>Bilan lipidique</td><td>05/06/2026</td><td>En attente</td><td><span class="badge badge-warn">En attente</span></td></tr>
+                  <tr><td>ECG</td><td>10/04/2026</td><td>HVG légère</td><td><span class="badge badge-success">Disponible</span></td></tr>
+                  <tr><td>Créatinine</td><td>15/03/2026</td><td>Normal</td><td><span class="badge badge-success">Disponible</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-panel" id="tab-docs">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer">
+                <i class="fas fa-file-pdf" style="font-size:28px;color:var(--red);margin-bottom:8px"></i>
+                <div style="font-size:12px;color:var(--white)">ECG_04042026.pdf</div>
+                <div style="font-size:11px;color:var(--slate)">10/04/2026</div>
+              </div>
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer">
+                <i class="fas fa-file-image" style="font-size:28px;color:var(--blue);margin-bottom:8px"></i>
+                <div style="font-size:12px;color:var(--white)">Radio_poumons.jpg</div>
+                <div style="font-size:11px;color:var(--slate)">15/03/2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ ORDONNANCES ═══════════════════ -->
+    <div class="page" id="page-ordonnances">
+      <div class="section-header">
+        <div><div class="section-title">Ordonnances</div><div class="section-sub">Créer et gérer les prescriptions</div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-ordonnance')"><i class="fas fa-plus"></i> Nouvelle ordonnance</button>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><div class="card-title">Ordonnances récentes</div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Patient</th><th>Date</th><th>Statut</th></tr></thead>
+                <tbody>
+                  <tr><td>ORD-047</td><td>DIOP Mamadou</td><td>05/06/2026</td><td><span class="badge badge-success">Validée</span></td></tr>
+                  <tr><td>ORD-046</td><td>NDIAYE Fatou</td><td>04/06/2026</td><td><span class="badge badge-success">Validée</span></td></tr>
+                  <tr><td>ORD-045</td><td>BA Mariama</td><td>04/06/2026</td><td><span class="badge badge-danger">Bloquée</span></td></tr>
+                  <tr><td>ORD-044</td><td>FALL Ibrahima</td><td>03/06/2026</td><td><span class="badge badge-success">Validée</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-exclamation-circle" style="color:var(--amber);margin-right:6px"></i>Détecteur d'interactions</div></div>
+          <div class="card-body">
+            <div style="font-size:13px;color:var(--slate-light);margin-bottom:14px">
+              Sélectionnez des médicaments pour vérifier automatiquement les interactions
+            </div>
+            <div class="form-group">
+              <label class="form-label">Médicament 1</label>
+              <select class="form-control" id="drug1" onchange="checkInteraction()">
+                <option value="">-- Sélectionner --</option>
+                <option value="warfarine">Warfarine</option>
+                <option value="aspirine">Aspirine</option>
+                <option value="amlodipine">Amlodipine</option>
+                <option value="losartan">Losartan</option>
+                <option value="metformine">Metformine</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Médicament 2</label>
+              <select class="form-control" id="drug2" onchange="checkInteraction()">
+                <option value="">-- Sélectionner --</option>
+                <option value="warfarine">Warfarine</option>
+                <option value="aspirine">Aspirine</option>
+                <option value="amlodipine">Amlodipine</option>
+                <option value="losartan">Losartan</option>
+                <option value="metformine">Metformine</option>
+              </select>
+            </div>
+            <div id="interaction-result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ URGENCES ═══════════════════ -->
+    <div class="page" id="page-urgences">
+      <div class="section-header">
+        <div><div class="section-title">Urgences</div><div class="section-sub">4 patients en attente de prise en charge</div></div>
+        <button class="btn btn-danger"><i class="fas fa-plus"></i> Nouvelle urgence</button>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card green"><div class="stat-icon"><i class="fas fa-check"></i></div><div class="stat-value">1</div><div class="stat-label">Faible</div></div>
+        <div class="stat-card amber"><div class="stat-icon"><i class="fas fa-exclamation"></i></div><div class="stat-value">1</div><div class="stat-label">Moyen</div></div>
+        <div class="stat-card red"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-value">1</div><div class="stat-label">Élevé</div></div>
+        <div class="stat-card red"><div class="stat-icon"><i class="fas fa-skull-crossbones"></i></div><div class="stat-value">1</div><div class="stat-label">Critique</div></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Heure d'arrivée</th><th>Niveau</th><th>Statut</th><th>Orientation</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>URG-047</td>
+                <td><strong>DIOP Mamadou</strong></td>
+                <td>09:14</td>
+                <td><span class="badge" style="background:rgba(239,68,68,0.2);color:#FF4444;font-weight:700">🚨 CRITIQUE</span></td>
+                <td><span class="badge badge-danger">En attente</span></td>
+                <td>Cardiologie</td>
+                <td><button class="btn btn-primary btn-sm">Prendre en charge</button></td>
+              </tr>
+              <tr>
+                <td>URG-046</td>
+                <td><strong>FALL Omar</strong></td>
+                <td>09:43</td>
+                <td><span class="badge badge-danger">Élevé</span></td>
+                <td><span class="badge badge-warn">En cours</span></td>
+                <td>Chirurgie</td>
+                <td><button class="btn btn-outline btn-sm">Voir fiche</button></td>
+              </tr>
+              <tr>
+                <td>URG-045</td>
+                <td><strong>SARR Bineta</strong></td>
+                <td>10:05</td>
+                <td><span class="badge badge-warn">Moyen</span></td>
+                <td><span class="badge badge-warn">En attente</span></td>
+                <td>Médecine générale</td>
+                <td><button class="btn btn-primary btn-sm">Prendre en charge</button></td>
+              </tr>
+              <tr>
+                <td>URG-044</td>
+                <td><strong>CISS Adama</strong></td>
+                <td>10:32</td>
+                <td><span class="badge badge-success">Faible</span></td>
+                <td><span class="badge badge-neutral">En attente</span></td>
+                <td>Médecine générale</td>
+                <td><button class="btn btn-primary btn-sm">Prendre en charge</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ STOCK ═══════════════════ -->
+    <div class="page" id="page-stock">
+      <div class="section-header">
+        <div><div class="section-title">Stock & Lots</div><div class="section-sub">Méthode FEFO · 5 alertes actives</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm"><i class="fas fa-arrow-down"></i> Entrée stock</button>
+          <button class="btn btn-primary btn-sm"><i class="fas fa-arrow-up"></i> Sortie stock</button>
+        </div>
+      </div>
+
+      <div class="alert alert-warn"><i class="fas fa-exclamation-triangle"></i> <strong>Méthode FEFO active</strong> — Les lots sont dispensés par ordre d'expiration croissante</div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Médicament</th><th>Lot</th><th>Expiration</th><th>Qté actuelle</th><th>Qté min</th><th>Statut</th><th>Alerte</th></tr></thead>
+            <tbody>
+              <tr class="lot-expiring">
+                <td>Amoxicilline 500mg</td><td>LOT-2024-089</td>
+                <td style="color:var(--amber)">15/07/2026</td>
+                <td>45</td><td>100</td>
+                <td><span class="badge badge-danger">Sous seuil</span></td>
+                <td><span class="badge badge-danger">🔴 Rupture imminente</span></td>
+              </tr>
+              <tr>
+                <td>Paracétamol 1g</td><td>LOT-2025-012</td>
+                <td>20/12/2026</td>
+                <td>380</td><td>150</td>
+                <td><span class="badge badge-success">Normal</span></td>
+                <td>—</td>
+              </tr>
+              <tr class="lot-expiring">
+                <td>Metformine 850mg</td><td>LOT-2024-056</td>
+                <td style="color:var(--red)">01/07/2026</td>
+                <td>12</td><td>80</td>
+                <td><span class="badge badge-danger">Critique</span></td>
+                <td><span class="badge badge-danger">🔴 Expiré bientôt</span></td>
+              </tr>
+              <tr>
+                <td>Losartan 100mg</td><td>LOT-2025-078</td>
+                <td>10/03/2027</td>
+                <td>220</td><td>100</td>
+                <td><span class="badge badge-success">Normal</span></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Amlodipine 10mg</td><td>LOT-2024-099</td>
+                <td style="color:var(--amber)">30/08/2026</td>
+                <td>67</td><td>100</td>
+                <td><span class="badge badge-warn">Attention</span></td>
+                <td><span class="badge badge-warn">🟡 Seuil minimum</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ ALERTES ═══════════════════ -->
+    <div class="page" id="page-alertes">
+      <div class="section-header">
+        <div><div class="section-title">Alertes stock</div><div class="section-sub">3 alertes actives nécessitant une action</div></div>
+        <button class="btn btn-outline btn-sm"><i class="fas fa-check"></i> Tout marquer comme lu</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="alert alert-danger">
+          <i class="fas fa-times-circle" style="font-size:18px;flex-shrink:0"></i>
+          <div style="flex:1">
+            <div style="font-weight:600;margin-bottom:4px">Rupture imminente — Amoxicilline 500mg</div>
+            <div style="font-size:12px">Quantité actuelle: 45 unités · Seuil minimum: 100 · Lot expire le 15/07/2026</div>
+          </div>
+          <button class="btn btn-danger btn-sm">Commander</button>
+        </div>
+        <div class="alert alert-danger">
+          <i class="fas fa-times-circle" style="font-size:18px;flex-shrink:0"></i>
+          <div style="flex:1">
+            <div style="font-weight:600;margin-bottom:4px">Expiration proche — Metformine 850mg</div>
+            <div style="font-size:12px">Quantité: 12 unités · Date d'expiration: 01/07/2026 · Moins de 30 jours</div>
+          </div>
+          <button class="btn btn-danger btn-sm">Traiter</button>
+        </div>
+        <div class="alert alert-warn">
+          <i class="fas fa-exclamation-triangle" style="font-size:18px;flex-shrink:0"></i>
+          <div style="flex:1">
+            <div style="font-weight:600;margin-bottom:4px">Seuil minimum atteint — Amlodipine 10mg</div>
+            <div style="font-size:12px">Quantité actuelle: 67 unités · Seuil minimum: 100 · Expiration: 30/08/2026</div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="border-color:var(--amber);color:var(--amber)">Commander</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ FACTURES ═══════════════════ -->
+    <div class="page" id="page-factures">
+      <div class="section-header">
+        <div><div class="section-title">Factures</div><div class="section-sub">Gestion des factures et remboursements assurance</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Nouvelle facture</button>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+        <div class="stat-card green"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">89</div><div class="stat-label">Payées</div></div>
+        <div class="stat-card amber"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">24</div><div class="stat-label">En attente</div></div>
+        <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-adjust"></i></div><div class="stat-value">12</div><div class="stat-label">Partiellement payées</div></div>
+        <div class="stat-card teal"><div class="stat-icon"><i class="fas fa-coins"></i></div><div class="stat-value">38.4M</div><div class="stat-label">Total mensuel FCFA</div></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Date</th><th>Montant</th><th>Assurance</th><th>Reste à payer</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>F2026-095</td><td>DIOP Mamadou</td><td>05/06/2026</td><td>85 000</td><td>CNAM (68 000)</td><td style="color:var(--amber)">17 000</td><td><span class="badge badge-warn">Partielle</span></td><td><button class="btn btn-primary btn-sm">Payer</button></td></tr>
+              <tr><td>F2026-094</td><td>NDIAYE Fatou</td><td>05/06/2026</td><td>45 000</td><td>IPM (22 500)</td><td style="color:var(--amber)">22 500</td><td><span class="badge badge-warn">Partielle</span></td><td><button class="btn btn-primary btn-sm">Payer</button></td></tr>
+              <tr><td>F2026-093</td><td>FALL Ibrahima</td><td>04/06/2026</td><td>30 000</td><td>—</td><td>30 000</td><td><span class="badge badge-danger">En attente</span></td><td><button class="btn btn-primary btn-sm">Payer</button></td></tr>
+              <tr><td>F2026-092</td><td>SECK Cheikh</td><td>04/06/2026</td><td>120 000</td><td>—</td><td style="color:var(--green)">Soldée</td><td><span class="badge badge-success">Payée</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-print"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PAIEMENTS ═══════════════════ -->
+    <div class="page" id="page-paiements">
+      <div class="section-header">
+        <div><div class="section-title">Paiements</div><div class="section-sub">Historique des transactions</div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-paiement')"><i class="fas fa-plus"></i> Enregistrer paiement</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Facture</th><th>Patient</th><th>Date</th><th>Montant</th><th>Mode</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td>PAY-0312</td><td>F2026-092</td><td>SECK Cheikh</td><td>04/06/2026</td><td>120 000 FCFA</td><td><span class="badge badge-info">Mobile Money</span></td><td><span class="badge badge-success">Validé</span></td></tr>
+              <tr><td>PAY-0311</td><td>F2026-088</td><td>BA Mariama</td><td>03/06/2026</td><td>45 000 FCFA</td><td><span class="badge badge-purple">Virement</span></td><td><span class="badge badge-success">Validé</span></td></tr>
+              <tr><td>PAY-0310</td><td>F2026-082</td><td>CISS Abdou</td><td>03/06/2026</td><td>30 000 FCFA</td><td><span class="badge badge-neutral">Espèces</span></td><td><span class="badge badge-success">Validé</span></td></tr>
+              <tr><td>PAY-0309</td><td>F2026-079</td><td>FALL Ibrahima</td><td>02/06/2026</td><td>67 500 FCFA</td><td><span class="badge badge-info">Carte bancaire</span></td><td><span class="badge badge-success">Validé</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ MEDECINS ═══════════════════ -->
+    <div class="page" id="page-medecins">
+      <div class="section-header">
+        <div><div class="section-title">Médecins</div><div class="section-sub">18 médecins actifs</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter médecin</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+        <div class="card" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div class="card-body" style="text-align:center;padding:24px 16px">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;margin:0 auto 12px">BS</div>
+            <div style="font-size:15px;font-weight:500">Dr. BA Seydou</div>
+            <div style="font-size:12px;color:var(--teal-light);margin-top:3px">Cardiologie</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px">Hôpital Central</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:14px">
+              <span class="badge badge-success">Disponible</span>
+              <span class="badge badge-info">14 RDV</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div class="card-body" style="text-align:center;padding:24px 16px">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;margin:0 auto 12px">NM</div>
+            <div style="font-size:15px;font-weight:500">Dr. NDIAYE Mariama</div>
+            <div style="font-size:12px;color:var(--teal-light);margin-top:3px">Pédiatrie</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px">Clinique Santé Plus</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:14px">
+              <span class="badge badge-warn">En consultation</span>
+              <span class="badge badge-info">8 RDV</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div class="card-body" style="text-align:center;padding:24px 16px">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--red));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;margin:0 auto 12px">SF</div>
+            <div style="font-size:15px;font-weight:500">Dr. SOW Fatima</div>
+            <div style="font-size:12px;color:var(--teal-light);margin-top:3px">Neurologie</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px">Hôpital Central</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:14px">
+              <span class="badge badge-success">Disponible</span>
+              <span class="badge badge-info">11 RDV</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div class="card-body" style="text-align:center;padding:24px 16px">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;margin:0 auto 12px">FA</div>
+            <div style="font-size:15px;font-weight:500">Dr. FAYE Alioune</div>
+            <div style="font-size:12px;color:var(--teal-light);margin-top:3px">Chirurgie générale</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px">Clinique Santé Plus</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin-top:14px">
+              <span class="badge badge-danger">Absent</span>
+              <span class="badge badge-info">5 RDV</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ NOTIFICATIONS ═══════════════════ -->
+    <div class="page" id="page-notifications">
+      <div class="section-header">
+        <div><div class="section-title">Notifications</div><div class="section-sub">7 notifications non lues</div></div>
+        <button class="btn btn-outline btn-sm">Tout marquer comme lu</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0 20px">
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(239,68,68,0.15)"><i class="fas fa-ambulance" style="color:var(--red)"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">Urgence critique — DIOP Mamadou</div>
+              <div class="notif-msg">Patient admis aux urgences, niveau critique, orientation Cardiologie requise</div>
+              <div class="notif-time">Il y a 5 min · Application</div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(245,158,11,0.15)"><i class="fas fa-pills" style="color:var(--amber)"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">Alerte stock — Amoxicilline 500mg</div>
+              <div class="notif-msg">Stock sous seuil minimum : 45 unités restantes. Commande urgente recommandée.</div>
+              <div class="notif-time">Il y a 28 min · Application + Email → pharmacie@tropical.sn</div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(59,130,246,0.15)"><i class="fas fa-calendar" style="color:var(--blue)"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">Rappel rendez-vous — SECK Aminata</div>
+              <div class="notif-msg">Rendez-vous demain à 09:00 avec Dr. NDIAYE Mariama · Pédiatrie</div>
+              <div class="notif-time">Il y a 1h · SMS → +221 77 xxx xxxx</div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(16,185,129,0.15)"><i class="fas fa-check-circle" style="color:var(--green)"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">Paiement reçu — Facture F2026-092</div>
+              <div class="notif-msg">Paiement de 120 000 FCFA reçu pour SECK Cheikh · Mobile Money</div>
+              <div class="notif-time">Il y a 41 min · Application</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(139,92,246,0.15)"><i class="fas fa-flask" style="color:var(--purple)"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">Résultat d'examen disponible — NDIAYE Fatou</div>
+              <div class="notif-msg">Résultats de la biopsie du 01/06/2026 sont disponibles</div>
+              <div class="notif-time">Il y a 2h · Application + Email → fatou.nd@email.sn</div>
+            </div>
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ RDV ═══════════════════ -->
+    <div class="page" id="page-rdv">
+      <div class="section-header">
+        <div><div class="section-title">Rendez-vous</div><div class="section-sub">Gestion des créneaux et rendez-vous</div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-rdv')"><i class="fas fa-plus"></i> Nouveau RDV</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Médecin</th><th>Date & Heure</th><th>Type</th><th>Créneau</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>RDV-201</td><td>DIOP Moussa</td><td>Dr. Ba</td><td>05/06 10:30</td><td>Consultation</td><td>C01</td><td><span class="badge badge-success">Confirmé</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm">✓</button><button class="btn btn-danger btn-sm">✗</button></div></td></tr>
+              <tr><td>RDV-202</td><td>SECK Aminata</td><td>Dr. Ndiaye</td><td>05/06 11:00</td><td>Pédiatrie</td><td>C02</td><td><span class="badge badge-warn">En attente</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-primary btn-sm">Valider</button><button class="btn btn-danger btn-sm">✗</button></div></td></tr>
+              <tr><td>RDV-203</td><td>CISS Abdou</td><td>Dr. Faye</td><td>05/06 14:00</td><td>Téléconsult.</td><td>TC01</td><td><span class="badge badge-info">Téléconsultation</span></td><td><button class="btn btn-primary btn-sm">Démarrer</button></td></tr>
+              <tr><td>RDV-204</td><td>DIOUF Marème</td><td>Dr. Sow</td><td>05/06 15:30</td><td>Neurologie</td><td>C03</td><td><span class="badge badge-success">Confirmé</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm">✓</button><button class="btn btn-danger btn-sm">✗</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ CENTRES ═══════════════════ -->
+    <div class="page" id="page-centres">
+      <div class="section-header">
+        <div><div class="section-title">Centres hospitaliers</div><div class="section-sub">3 centres actifs</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter centre</button>
+      </div>
+      <div class="three-col">
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:18px;font-weight:500;margin-bottom:4px">Hôpital Tropical Central</div>
+            <div style="font-size:12px;color:var(--teal-light);margin-bottom:12px">Centre principal</div>
+            <div class="metric-row"><span class="metric-label">Adresse</span><span class="metric-val">Dakar, Plateau</span></div>
+            <div class="metric-row"><span class="metric-label">Téléphone</span><span class="metric-val">+221 33 821 0000</span></div>
+            <div class="metric-row"><span class="metric-label">Services</span><span class="metric-val">8 services</span></div>
+            <div class="metric-row"><span class="metric-label">Médecins</span><span class="metric-val">12 médecins</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:18px;font-weight:500;margin-bottom:4px">Clinique Santé Plus</div>
+            <div style="font-size:12px;color:var(--slate-light);margin-bottom:12px">Clinique secondaire</div>
+            <div class="metric-row"><span class="metric-label">Adresse</span><span class="metric-val">Dakar, Almadies</span></div>
+            <div class="metric-row"><span class="metric-label">Téléphone</span><span class="metric-val">+221 33 869 1200</span></div>
+            <div class="metric-row"><span class="metric-label">Services</span><span class="metric-val">5 services</span></div>
+            <div class="metric-row"><span class="metric-label">Médecins</span><span class="metric-val">6 médecins</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:18px;font-weight:500;margin-bottom:4px">Centre Médical Thiès</div>
+            <div style="font-size:12px;color:var(--slate-light);margin-bottom:12px">Annexe régionale</div>
+            <div class="metric-row"><span class="metric-label">Adresse</span><span class="metric-val">Thiès, Centre-ville</span></div>
+            <div class="metric-row"><span class="metric-label">Téléphone</span><span class="metric-val">+221 33 951 3400</span></div>
+            <div class="metric-row"><span class="metric-label">Services</span><span class="metric-val">3 services</span></div>
+            <div class="metric-row"><span class="metric-label">Médecins</span><span class="metric-val">4 médecins</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ SERVICES ═══════════════════ -->
+    <div class="page" id="page-services">
+      <div class="section-header">
+        <div><div class="section-title">Services</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter service</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Service</th><th>Description</th><th>Centre</th><th>Médecins</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>Cardiologie</td><td>Maladies cardio-vasculaires</td><td>Hôpital Central</td><td>3</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Pédiatrie</td><td>Soins pour enfants</td><td>Hôpital Central</td><td>2</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Chirurgie</td><td>Chirurgie générale</td><td>Clinique Santé Plus</td><td>2</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Neurologie</td><td>Maladies du système nerveux</td><td>Hôpital Central</td><td>2</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Médecine générale</td><td>Consultations générales</td><td>Centre Médical Thiès</td><td>4</td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ TELECONSULTATION ═══════════════════ -->
+    <div class="page" id="page-teleconsultation">
+      <div class="section-header">
+        <div><div class="section-title">Téléconsultation</div><div class="section-sub">Sessions vidéo sécurisées</div></div>
+        <button class="btn btn-primary"><i class="fas fa-video"></i> Nouvelle session</button>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Session en cours</div><span class="badge badge-danger" style="animation:pulse 1.5s infinite">🔴 En direct</span></div>
+          <div class="card-body" style="text-align:center">
+            <div style="background:var(--navy3);border-radius:12px;padding:32px;margin-bottom:16px">
+              <i class="fas fa-video" style="font-size:48px;color:var(--teal);margin-bottom:12px"></i>
+              <div style="font-size:15px;font-weight:500">CISS Abdou ↔ Dr. Faye</div>
+              <div style="font-size:12px;color:var(--slate-light);margin-top:4px">Durée: 00:14:32</div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:10px">
+              <button class="btn btn-outline btn-sm"><i class="fas fa-microphone-slash"></i></button>
+              <button class="btn btn-outline btn-sm"><i class="fas fa-video-slash"></i></button>
+              <button class="btn btn-danger btn-sm"><i class="fas fa-phone-slash"></i> Terminer</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Sessions planifiées</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Patient</th><th>Médecin</th><th>Date</th><th>Statut</th></tr></thead>
+              <tbody>
+                <tr><td>CISS Abdou</td><td>Dr. Faye</td><td>Aujourd'hui 14:00</td><td><span class="badge badge-danger">En cours</span></td></tr>
+                <tr><td>DIOUF Marème</td><td>Dr. Sow</td><td>Demain 10:30</td><td><span class="badge badge-info">Planifiée</span></td></tr>
+                <tr><td>SARR Bineta</td><td>Dr. Ba</td><td>07/06 15:00</td><td><span class="badge badge-info">Planifiée</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ LISTE ATTENTE ═══════════════════ -->
+    <div class="page" id="page-liste_attente">
+      <div class="section-header">
+        <div><div class="section-title">Liste d'attente</div><div class="section-sub">Inscription et priorisation automatique</div></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Date inscription</th><th>Service</th><th>Priorité</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>LA-089</td><td>TRAORE Aminata</td><td>04/06/2026</td><td>Cardiologie</td><td><span class="badge badge-danger">Haute</span></td><td><span class="badge badge-warn">En attente</span></td><td><button class="btn btn-primary btn-sm">Affecter RDV</button></td></tr>
+              <tr><td>LA-088</td><td>MBAYE Ibou</td><td>03/06/2026</td><td>Pédiatrie</td><td><span class="badge badge-warn">Normale</span></td><td><span class="badge badge-warn">En attente</span></td><td><button class="btn btn-primary btn-sm">Affecter RDV</button></td></tr>
+              <tr><td>LA-087</td><td>GUEYE Coumba</td><td>02/06/2026</td><td>Médecine générale</td><td><span class="badge badge-neutral">Basse</span></td><td><span class="badge badge-warn">En attente</span></td><td><button class="btn btn-primary btn-sm">Affecter RDV</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ MEDICAMENTS ═══════════════════ -->
+    <div class="page" id="page-medicaments">
+      <div class="section-header">
+        <div><div class="section-title">Médicaments</div><div class="section-sub">Catalogue de la pharmacie</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter médicament</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Médicament</th><th>Dosage</th><th>Type</th><th>Prix (FCFA)</th><th>Contre-indications</th><th>Stock</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>Amoxicilline</td><td>500mg</td><td>Antibiotique</td><td>1 200</td><td>Pénicillines, allergies</td><td><span class="badge badge-danger">45</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Paracétamol</td><td>1g</td><td>Analgésique</td><td>350</td><td>Insuffisance hépatique</td><td><span class="badge badge-success">380</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Amlodipine</td><td>10mg</td><td>Antihypertenseur</td><td>2 500</td><td>Hypotension sévère</td><td><span class="badge badge-warn">67</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Losartan</td><td>100mg</td><td>Antihypertenseur</td><td>3 000</td><td>Grossesse, hyperkaliémie</td><td><span class="badge badge-success">220</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+              <tr><td>Metformine</td><td>850mg</td><td>Antidiabétique</td><td>800</td><td>Insuffisance rénale</td><td><span class="badge badge-danger">12</span></td><td><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ CONSULTATIONS ═══════════════════ -->
+    <div class="page" id="page-consultations">
+      <div class="section-header">
+        <div><div class="section-title">Consultations</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Nouvelle consultation</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Médecin</th><th>Date</th><th>Type</th><th>Diagnostic</th><th>Facture</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>CON-312</td><td>DIOP Mamadou</td><td>Dr. Sow</td><td>05/06/2026 09:00</td><td>Suivi</td><td>HTA grade II</td><td><span class="badge badge-warn">Générée</span></td><td><button class="btn btn-outline btn-sm">Détails</button></td></tr>
+              <tr><td>CON-311</td><td>FALL Ibrahima</td><td>Dr. Ba</td><td>05/06/2026 08:30</td><td>Consultation</td><td>Grippe saisonnière</td><td><span class="badge badge-success">Payée</span></td><td><button class="btn btn-outline btn-sm">Détails</button></td></tr>
+              <tr><td>CON-310</td><td>NDIAYE Fatou</td><td>Dr. Ndiaye</td><td>04/06/2026 14:00</td><td>Contrôle</td><td>Asthme bronchique</td><td><span class="badge badge-warn">En attente</span></td><td><button class="btn btn-outline btn-sm">Détails</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ EXAMENS ═══════════════════ -->
+    <div class="page" id="page-examens">
+      <div class="section-header">
+        <div><div class="section-title">Résultats d'examens</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter résultat</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Type examen</th><th>Date</th><th>Commentaire</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td>EX-089</td><td>DIOP Mamadou</td><td>Bilan lipidique</td><td>05/06/2026</td><td>En attente</td><td><span class="badge badge-warn">En attente</span></td></tr>
+              <tr><td>EX-088</td><td>NDIAYE Fatou</td><td>Biopsie</td><td>01/06/2026</td><td>Résultat normal</td><td><span class="badge badge-success">Disponible</span></td></tr>
+              <tr><td>EX-087</td><td>DIOP Mamadou</td><td>ECG</td><td>10/04/2026</td><td>HVG légère</td><td><span class="badge badge-success">Disponible</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ ASSURANCES ═══════════════════ -->
+    <div class="page" id="page-assurances">
+      <div class="section-header">
+        <div><div class="section-title">Assurances</div></div>
+        <button class="btn btn-primary"><i class="fas fa-plus"></i> Ajouter assurance</button>
+      </div>
+      <div class="three-col">
+        <div class="card"><div class="card-body"><div style="font-size:16px;font-weight:500;margin-bottom:8px">CNAM</div><div style="font-size:12px;color:var(--slate-light);margin-bottom:12px">Caisse Nationale d'Assurance Maladie</div><div class="metric-row"><span class="metric-label">Couverture</span><span class="metric-val" style="color:var(--teal)">80%</span></div><div class="metric-row"><span class="metric-label">Patients couverts</span><span class="metric-val">89</span></div></div></div>
+        <div class="card"><div class="card-body"><div style="font-size:16px;font-weight:500;margin-bottom:8px">IPM</div><div style="font-size:12px;color:var(--slate-light);margin-bottom:12px">Institution de Prévoyance Maladie</div><div class="metric-row"><span class="metric-label">Couverture</span><span class="metric-val" style="color:var(--teal)">50%</span></div><div class="metric-row"><span class="metric-label">Patients couverts</span><span class="metric-val">56</span></div></div></div>
+        <div class="card"><div class="card-body"><div style="font-size:16px;font-weight:500;margin-bottom:8px">Allianz Sénégal</div><div style="font-size:12px;color:var(--slate-light);margin-bottom:12px">Assurance privée</div><div class="metric-row"><span class="metric-label">Couverture</span><span class="metric-val" style="color:var(--teal)">100%</span></div><div class="metric-row"><span class="metric-label">Patients couverts</span><span class="metric-val">23</span></div></div></div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</main>
+
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+
+<!-- MODAL PATIENT -->
+<div class="modal-overlay" id="modal-patient">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nouveau patient</div>
+      <button class="modal-close" onclick="closeModal('modal-patient')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Nom</label><input type="text" class="form-control" placeholder="Nom de famille"></div>
+        <div class="form-group"><label class="form-label">Prénom</label><input type="text" class="form-control" placeholder="Prénom"></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Sexe</label><select class="form-control"><option>Masculin</option><option>Féminin</option></select></div>
+        <div class="form-group"><label class="form-label">Date de naissance</label><input type="date" class="form-control"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Adresse</label><input type="text" class="form-control" placeholder="Adresse complète"></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-control" placeholder="+221 7X XXX XXXX"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" placeholder="email@exemple.com"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Assurance</label><select class="form-control"><option>Aucune</option><option>CNAM</option><option>IPM</option><option>Allianz Sénégal</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-patient')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-patient')"><i class="fas fa-save"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RDV -->
+<div class="modal-overlay" id="modal-rdv">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nouveau rendez-vous</div>
+      <button class="modal-close" onclick="closeModal('modal-rdv')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Patient</label><select class="form-control"><option>DIOP Mamadou</option><option>NDIAYE Fatou</option><option>SECK Cheikh</option></select></div>
+      <div class="form-group"><label class="form-label">Médecin</label><select class="form-control"><option>Dr. BA Seydou — Cardiologie</option><option>Dr. NDIAYE Mariama — Pédiatrie</option><option>Dr. SOW Fatima — Neurologie</option></select></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-control"></div>
+        <div class="form-group"><label class="form-label">Type</label><select class="form-control"><option>Consultation</option><option>Téléconsultation</option><option>Suivi</option><option>Urgence</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Créneau disponible</label><select class="form-control"><option>10:00 — 10:30 (disponible)</option><option>11:00 — 11:30 (disponible)</option><option>14:00 — 14:30 (disponible)</option></select></div>
+      <div style="background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--teal-light)">
+        <i class="fas fa-bell" style="margin-right:6px"></i>
+        Notification automatique au patient et au médecin : 24h et 1h avant le RDV
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-rdv')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-rdv')"><i class="fas fa-save"></i> Créer le RDV</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ORDONNANCE -->
+<div class="modal-overlay" id="modal-ordonnance">
+  <div class="modal" style="width:640px">
+    <div class="modal-header">
+      <div class="modal-title">Nouvelle ordonnance</div>
+      <button class="modal-close" onclick="closeModal('modal-ordonnance')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Patient</label><select class="form-control"><option>DIOP Mamadou</option><option>NDIAYE Fatou</option></select></div>
+        <div class="form-group"><label class="form-label">Consultation liée</label><select class="form-control"><option>CON-312 — 05/06/2026</option><option>CON-311 — 05/06/2026</option></select></div>
+      </div>
+      <div style="background:var(--navy3);border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--slate-light);text-transform:uppercase;margin-bottom:10px">Médicament 1</div>
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Médicament</label><select class="form-control" onchange="checkInteractionModal(this)"><option>Amlodipine 10mg</option><option>Losartan 100mg</option><option>Warfarine</option><option>Aspirine</option></select></div>
+          <div class="form-group"><label class="form-label">Posologie</label><input type="text" class="form-control" placeholder="ex: 1cp matin et soir"></div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px"><i class="fas fa-plus"></i> Ajouter médicament</button>
+      <div class="form-group"><label class="form-label">Durée du traitement</label><input type="text" class="form-control" placeholder="ex: 30 jours"></div>
+      <div id="modal-interaction" class="interaction-check interaction-faible" style="display:none">
+        <i class="fas fa-check-circle" style="margin-right:8px"></i>
+        <strong>Aucune interaction détectée</strong> — Ordonnance validable
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-ordonnance')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-ordonnance')"><i class="fas fa-signature"></i> Signer & Valider</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAIEMENT -->
+<div class="modal-overlay" id="modal-paiement">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Enregistrer un paiement</div>
+      <button class="modal-close" onclick="closeModal('modal-paiement')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Facture</label><select class="form-control"><option>F2026-095 — DIOP Mamadou — Reste: 17 000 FCFA</option><option>F2026-094 — NDIAYE Fatou — Reste: 22 500 FCFA</option><option>F2026-093 — FALL Ibrahima — Reste: 30 000 FCFA</option></select></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Montant (FCFA)</label><input type="number" class="form-control" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Mode de paiement</label>
+          <select class="form-control">
+            <option>Espèces</option>
+            <option>Carte bancaire</option>
+            <option>Mobile Money</option>
+            <option>Virement bancaire</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Date du paiement</label><input type="date" class="form-control" value="2026-06-05"></div>
+      <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#34D399">
+        <i class="fas fa-info-circle" style="margin-right:6px"></i>
+        Une facture peut être réglée par plusieurs paiements partiels
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-paiement')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-paiement')"><i class="fas fa-check"></i> Valider paiement</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+
+<script>
+function showPage(pageId, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const titles = {
+    dashboard: 'Tableau de bord',
+    patients: 'Patients',
+    dossiers: 'Dossiers médicaux',
+    consultations: 'Consultations',
+    rdv: 'Rendez-vous',
+    teleconsultation: 'Téléconsultation',
+    urgences: 'Urgences',
+    liste_attente: "Liste d'attente",
+    ordonnances: 'Ordonnances',
+    examens: "Résultats d'examens",
+    medicaments: 'Médicaments',
+    stock: 'Stock & Lots',
+    alertes: 'Alertes stock',
+    factures: 'Factures',
+    paiements: 'Paiements',
+    assurances: 'Assurances',
+    centres: 'Centres hospitaliers',
+    services: 'Services',
+    medecins: 'Médecins',
+    notifications: 'Notifications'
+  };
+  document.getElementById('page-title').textContent = titles[pageId] || pageId;
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function switchTab(el, panelId) {
+  const parent = el.closest('.card-body') || el.closest('.card');
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+const interactions = {
+  'warfarine-aspirine': { level: 'critique', text: '🔴 Interaction CRITIQUE — Warfarine + Aspirine : risque hémorragique majeur. Contre-indication formelle. Ordonnance bloquée.', cls: 'interaction-critique' },
+  'aspirine-warfarine': { level: 'critique', text: '🔴 Interaction CRITIQUE — Aspirine + Warfarine : risque hémorragique majeur. Contre-indication formelle. Ordonnance bloquée.', cls: 'interaction-critique' },
+  'amlodipine-losartan': { level: 'modere', text: '🟡 Interaction MODÉRÉE — Amlodipine + Losartan : association antihypertensive possible. Surveiller la tension artérielle. Ajustement posologique recommandé.', cls: 'interaction-modere' },
+  'losartan-amlodipine': { level: 'modere', text: '🟡 Interaction MODÉRÉE — Losartan + Amlodipine : association antihypertensive possible. Surveiller la tension artérielle.', cls: 'interaction-modere' },
+};
+
+function checkInteraction() {
+  const d1 = document.getElementById('drug1').value;
+  const d2 = document.getElementById('drug2').value;
+  const result = document.getElementById('interaction-result');
+  if (!d1 || !d2 || d1 === d2) { result.innerHTML = ''; return; }
+  const key = d1 + '-' + d2;
+  if (interactions[key]) {
+    const i = interactions[key];
+    result.innerHTML = `<div class="interaction-check ${i.cls}">${i.text}</div>`;
+  } else {
+    result.innerHTML = `<div class="interaction-check interaction-faible">✅ <strong>Aucune interaction connue</strong> entre ${d1} et ${d2}. Combinaison sûre.</div>`;
+  }
+}
+
+function checkInteractionModal(el) {
+  const box = document.getElementById('modal-interaction');
+  box.style.display = 'block';
+}
+
+window.addEventListener('resize', () => {
+  const menuBtn = document.getElementById('menu-btn');
+  if (window.innerWidth <= 900) menuBtn.style.display = 'flex';
+  else menuBtn.style.display = 'none';
+});
+window.dispatchEvent(new Event('resize'));
+</script>
+</body>
+</html>
